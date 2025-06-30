@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# This script deletes a local branch,
+# and deletes the associated remote (origin by default) branch,
+
+# Check if the branch name is provided
+if [ -z "$1" ]; then
+  echo "Usage: $0 <new_branch_name>"
+  exit 1
+fi
+
+BRANCH_TO_DELETE="$1"
+REMOTE_NAME="origin"
+
+# 1. Make sure on Main local branch
+git checkout main &>/dev/null
+
+# 2. Delete remote branch
+echo "Deleting remote branch: $BRANCH_TO_DELETE"
+git push "$REMOTE_NAME" --delete "$BRANCH_TO_DELETE" &>/dev/null
+
+# Check if deletion was successful
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to delete remote branch '$BRANCH_TO_DELETE'."
+  exit 1
+fi
+
+# 3. Delete local branch
+echo "Deleting local branch: $BRANCH_TO_DELETE"
+git branch -d "$BRANCH_TO_DELETE" &>/dev/null
+
+# Check if push was successful
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to delete local branch '$BRANCH_TO_DELETE'."
+  exit 1
+fi
+
+echo "Successfully deleted branch '$BRANCH_TO_DELETE',"
+echo "both locally and on remote '$REMOTE_NAME'."

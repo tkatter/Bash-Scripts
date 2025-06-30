@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# This script creates a new local branch,
+# pushes it to the remote (origin by default),
+# and sets the local branch to track the new remote branch.
+
+# Check if the branch name is provided
+if [ -z "$1" ]; then
+  echo "Usage: $0 <new_branch_name>"
+  exit 1
+fi
+
+NEW_BRANCH_NAME="$1"
+REMOTE_NAME="origin"
+
+# 1. Create and switch to the new local branch
+echo "Creating and switching to local branch: $NEW_BRANCH_NAME"
+git checkout -b "$NEW_BRANCH_NAME" &>/dev/null
+
+# Check if checkout was successful
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to create or switch to local branch '$NEW_BRANCH_NAME'."
+  exit 1
+fi
+
+# 2. Push new local branch to the remote and set it to track
+echo "Pushing '$NEW_BRANCH_NAME' to '$REMOTE_NAME' and setting as upstream."
+git push -u "$REMOTE_NAME" "$NEW_BRANCH_NAME" &>/dev/null
+
+# Check if push was successful
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to push branch '$NEW_BRANCH_NAME' to '$REMOTE_NAME'."
+  echo "You might need to manually clean up the local branch if it was created: git branch -D $NEW_BRANCH_NAME"
+  exit 1
+fi
+
+echo "Successfully created local branch '$NEW_BRANCH_NAME',"
+echo "pushed it to '$REMOTE_NAME',"
+echo "and set it to track '$REMOTE_NAME/$NEW_BRANCH_NAME'."
+echo "You are now on branch '$NEW_BRANCH_NAME'."
