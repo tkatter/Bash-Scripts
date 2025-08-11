@@ -1,0 +1,45 @@
+#!/usr/bin/bash
+
+SOURCE_DIR="/home/thomas/Documents/obsidian/vaults/school/"
+DEST_DIR="/media/school/obsidian/"
+
+# rsync options
+# -a: archive mode (preserves permissions, timestamps, etc.)
+# -r: recursive
+# -l: links (copies symbolic links)
+# -p: perms (preserves permissions i.e. rwx)
+# -t: times (preserves modification times)
+# -D: devices (preserves device files, if any)
+# -v: verbose (show progress)
+# -h: human-readable (sizes)
+# --delete: remove files from DEST_DIR if they no longer exist in SOURCE_DIR
+# --dry-run: (OPTIONAL) Add this for testing, remove for actual sync
+BASE_RSYNC_OPTIONS="-rlptDvh --delete"
+
+DRY_RUN_OPT=""
+
+if [[ "$1" == "-d" || "$1" == "--dry-run" ]]; then
+  DRY_RUN_OPT="--dry-run"
+  /usr/bin/echo "Dry run enabled"
+  # shift args so the rest of script doesn't see '-d' as a path
+  shift
+fi
+
+RSYNC_OPTIONS="$BASE_RSYNC_OPTIONS $DRY_RUN_OPT"
+
+/usr/bin/echo "Starting rsync synchronization..."
+/usr/bin/echo "Source: $SOURCE_DIR"
+/usr/bin/echo "Destination: $DEST_DIR"
+/usr/bin/echo "Options: $RSYNC_OPTIONS"
+/usr/bin/echo "---------------------------------"
+
+/usr/bin/rsync $RSYNC_OPTIONS "$SOURCE_DIR" "$DEST_DIR"
+
+if [ $? -eq 0 ]; then
+  /usr/bin/echo "-----------------------------"
+  /usr/bin/echo "Rsync completed successfully!"
+else
+  /usr/bin/echo "--------------------------------"
+  /usr/bin/echo "Rsync failed with error code $?."
+  /usr/bin/echo "Check output above for details."
+fi
