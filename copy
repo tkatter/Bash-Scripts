@@ -1,0 +1,30 @@
+#!/bin/bash
+# copy - universal clipboard script for Linux, macOS, Windows
+
+copy_to_clipboard() {
+  if command -v xclip >/dev/null 2>&1; then
+    xclip -selection clipboard
+  elif command -v wl-copy >/dev/null 2>&1; then
+    wl-copy
+  elif command -v pbcopy >/dev/null 2>&1; then
+    pbcopy
+  elif command -v clip.exe >/dev/null 2>&1; then
+    clip.exe
+  else
+    echo "Error: No clipboard command found (install xclip, wl-clipboard, pbcopy, or use Windows with clip.exe)." >&2
+    exit 1
+  fi
+}
+
+if [ -t 0 ]; then
+  # No stdin (no pipe)
+  if [ $# -eq 0 ]; then
+    echo "Usage: echo 'text' | copy   OR   copy 'text to copy'" >&2
+    exit 1
+  else
+    printf "%s" "$*" | copy_to_clipboard
+  fi
+else
+  # Input comes from a pipe
+  copy_to_clipboard
+fi
