@@ -1,0 +1,5 @@
+#!/bin/bash
+# This script is to be used as a wrapper for .desktop
+# files when run with rofi's drun (i.e. pkexec timeshift-gtk)
+app="$@"
+exec sh -lc "pkexec $app"

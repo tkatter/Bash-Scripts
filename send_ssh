@@ -1,0 +1,34 @@
+#!/usr/bin/bash
+# gen ssh keypair and send to server
+# https://devhints.io/bash
+# https://linuxconfig.org/bash-scripting-cheat-sheet
+
+set -e
+
+SSH_ADDRESS=""
+COMMENT=""
+KEY_DIR="$HOME/.ssh/"
+KEY_FNAME="id_ed25519"
+SUFFIX=""
+PASSWORD=""
+
+read -p "SSH address (USER@<ip>): " SSH_ADDRESS
+read -p "Key file suffix: " SUFFIX
+read -p "Comment: " COMMENT
+read -p "Change key path [y/N]? " CHANGE_KEY_PATH
+
+if [[ $CHANGE_KEY_PATH == "y" ]]; then
+  read -p "\nPath: " KEY_PATH
+
+  KEY_FNAME=${KEY_PATH##*/}
+  KEY_DIR=${KEY_PATH%$KEY_FNAME}
+fi
+
+read -p "Use passphrase [y/N]? " USE_PW
+
+if [[ $USE_PW == "y" ]]; then
+  read -p "Enter password: " -s PASSWORD
+fi
+
+ssh-keygen -t ed25519 -f "$KEY_DIR$KEY_FNAME""_$SUFFIX" -C "$COMMENT" -N "$PASSWORD"
+ssh-copy-id -i "$KEY_DIR$KEY_FNAME""_$SUFFIX.pub" "$SSH_ADDRESS"
